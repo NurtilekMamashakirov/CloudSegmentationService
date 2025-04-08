@@ -8,5 +8,7 @@ app = FastAPI()
 @app.post("/segment-clouds")
 async def root(file_path: FilePath):
     path = file_path.path
-    segmentate_image_path = segmentate_image(path)
-    return {"path": segmentate_image_path}
+    segmentated_image = segmentate_image(path)
+    path = segmentated_image["path"]
+    cloud_percentage = segmentated_image["cloud_percentage"]
+    return {"path": path, "cloud_percentage": cloud_percentage}

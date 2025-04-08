@@ -1,6 +1,7 @@
 import torch
 import torchvision
 from PIL import Image
+from torch import Tensor
 from torchvision import transforms
 from torchvision.transforms import functional
 
@@ -27,4 +28,14 @@ def segmentate_image(path: str):
     image_file = path.split("/")[-1]
     segmentated_image_path = os.path.join(segmentated_images_dir, image_file)
     torchvision.utils.save_image(segmentated_tensor, segmentated_image_path)
-    return segmentated_image_path
+    cloud_percentage = calculate_cloud_percentage(segmentated_tensor)
+    return {"path": segmentated_image_path,
+            "cloud_percentage": cloud_percentage}
+
+
+def calculate_cloud_percentage(tensor: Tensor):
+    threshold = 2.2
+    tensor = tensor.squeeze()
+    clouds_pix = tensor[tensor > threshold].sum().sum()
+    all_pix = tensor.shape[0] * tensor.shape[1]
+    return clouds_pix / all_pix
